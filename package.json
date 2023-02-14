@@ -1,0 +1,32 @@
+{
+  "name": "event-cloner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlipperLP/event-cloner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlipperLP/event-cloner/issues"
+  },
+  "homepage": "https://github.com/FlipperLP/event-cloner#readme",
+  "dependencies": {
+    "@discordjs/builders": "^1.4.0",
+    "bufferutil": "^4.0.7",
+    "discord.js": "^14.7.1",
+    "html-to-image": "^1.11.11",
+    "utf-8-validate": "^6.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.34.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5"
+  }
+}
