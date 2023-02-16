@@ -1,6 +1,11 @@
 // init Discord
 import {
-  Client, IntentsBitField, Partials, EmbedBuilder,
+  Client,
+  IntentsBitField,
+  Partials,
+  EmbedBuilder,
+  GuildScheduledEventStatus,
+  GuildScheduledEventEntityType,
 } from 'discord.js';
 // init config
 import { readFileSync } from 'fs';
@@ -33,9 +38,9 @@ function getJobList(guildEvent) {
     // filter if event is being listened to
     .filter((job) => job.listen.includes(guildEvent.guildId))
     // filter if event type is active
-    .filter((job) => (guildEvent.entityType === 1 ? job.type.stageInstance : true))
-    .filter((job) => (guildEvent.entityType === 2 ? job.type.voice : true))
-    .filter((job) => (guildEvent.entityType === 3 ? job.type.external : true));
+    .filter((job) => (guildEvent.entityType === GuildScheduledEventEntityType.StageInstance ? job.type.stageInstance : true))
+    .filter((job) => (guildEvent.entityType === GuildScheduledEventEntityType.Voice ? job.type.voice : true))
+    .filter((job) => (guildEvent.entityType === GuildScheduledEventEntityType.External ? job.type.external : true));
 }
 
 function announcementHandler({
@@ -80,10 +85,10 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
         guildEventEdit.description = `${createdEvent.description}\n${job.eventDescSuffix}\n\n${createdEvent.id}`;
         let location;
         switch (createdEvent.entityType) {
-          case 1:
+          case GuildScheduledEventEntityType.StageInstance:
             location = `Stage "${createdEvent.channel.name}" in ${createdEvent.guild.name}`;
             break;
-          case 2:
+          case GuildScheduledEventEntityType.Voice:
             location = `VC "${createdEvent.channel.name}" in ${createdEvent.guild.name}`;
             break;
           default:
