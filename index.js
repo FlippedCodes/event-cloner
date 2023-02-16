@@ -89,7 +89,7 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
         const guildEventEdit = createdEvent;
         guildEventEdit.scheduledStartTime = createdEvent.scheduledStartTimestamp;
         guildEventEdit.scheduledEndTime = createdEvent.scheduledEndTimestamp;
-        if (createdEvent.entityType !== 3) {
+        if (!createdEvent.scheduledEndTimestamp) {
           // plus 2 hours. discords default
           guildEventEdit.scheduledEndTime = createdEvent.scheduledStartTimestamp + 7.2e+6;
         }
