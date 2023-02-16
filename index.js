@@ -88,11 +88,10 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
         // create overwrites due to missing cross guild support from discord
         const guildEventEdit = createdEvent;
         guildEventEdit.scheduledStartTime = createdEvent.scheduledStartTimestamp;
-        guildEventEdit.scheduledEndTime = createdEvent.scheduledEndTimestamp;
-        if (!createdEvent.scheduledEndTimestamp) {
+        guildEventEdit.scheduledEndTime = createdEvent.scheduledEndTimestamp
+          ? createdEvent.scheduledEndTimestamp
           // plus 2 hours. discords default
-          guildEventEdit.scheduledEndTime = createdEvent.scheduledStartTimestamp + 7.2e+6;
-        }
+          : createdEvent.scheduledStartTimestamp + 7.2e+6;
         guildEventEdit.description = `${createdEvent.description}\n${job.eventDescSuffix}\n\n${createdEvent.id}`;
         let location;
         switch (createdEvent.entityType) {
