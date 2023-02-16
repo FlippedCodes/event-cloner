@@ -116,18 +116,20 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
     });
 });
 
-// client.on('guildScheduledEventUpdate', async (updatedEvent) => {
-//   const jobList = getJobList(updatedEvent);
-//   jobList.forEach((job) => {
-//     job.distribute.forEach(async (distributionGuildID) => {
-//       const guild = await client.guilds.cache.get(distributionGuildID);
-//       const event = guild.scheduledEvents.cache
-//         .find((remoteEvent) => remoteEvent.description.includes(updatedEvent.id));
-//       if (!event) return console.warn(`Unable to find the event "${updatedEvent.name}" in the guild ${distributionGuildID}. The event was most likely edited or the bot was offline and didn't catch the update.`);
-//       event.delete(event);
-//     });
-//   });
-// });
+// TODO: needs testing
+client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
+  const jobList = getJobList(updatedEvent);
+  const eventList = jobList.map((job) => getJobEvents(job));
+  // event starts
+  if (updatedEvent.isActive()) eventList.forEach((event) => event.setStatus(GuildScheduledEventStatus.Active));
+  // ended successfully
+  else if (updatedEvent.isCompleted()) eventList.forEach((event) => event.setStatus(GuildScheduledEventStatus.Completed));
+  // general update
+  else if (updatedEvent.isScheduled()) {
+    const guildEventEdit = eventOverwrite(updatedEvent);
+    eventList.forEach((event) => event.edit(guildEventEdit));
+  } else console.warn(`Unknown update on the event ${updatedEvent.id} - ${updatedEvent.name}`);
+});
 
 client.on('guildScheduledEventDelete', async (deletedEvent) => {
   const jobList = getJobList(deletedEvent);
