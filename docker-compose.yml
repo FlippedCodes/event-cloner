@@ -4,3 +4,6 @@ services:
     build:
       context: ./
     restart: always
+    environment:
+      discordToken: ${discordToken}
+      

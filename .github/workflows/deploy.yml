@@ -1,0 +1,24 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ ]
+
+jobs:
+  build:
+    runs-on: stardrive
+
+    env:
+      discordToken: ${{ secrets.TOKEN_DISCORD }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update 3rd party docker containers
+        run: docker compose pull
+
+      - name: Build app
+        run: docker compose build
+
+      - name: Spin up containers
+        run: docker compose up -d
