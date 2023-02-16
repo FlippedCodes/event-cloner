@@ -1,0 +1,34 @@
+{
+  "logChannel": "470889870160822273",
+  "functions": {
+      "eventCloner": {
+        "jobs": [
+          {
+            "listen": ["451833819910373406"],
+            "distribute": ["300051375914483715"],
+            "type": {
+              "stageInstance": false,
+              "voice": true,
+              "external": true
+            },
+            "eventDescSuffix": "Text after original desc"
+          }
+        ]
+      },
+      "eventAnnounce": {
+        "jobs": [
+          {
+            "channels": ["493510451234078730"],
+            "type": {
+              "created": true,
+              "started": true,
+              "textUpdated": false,
+              "timeUpdated": true,
+              "deleted": true
+            },
+            "message": "Message before the link"
+          }
+        ]
+      }
+  }
+}
