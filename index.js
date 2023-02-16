@@ -69,6 +69,31 @@ function getJobEvents(job) {
   return events;
 }
 
+// create overwrites due to missing cross guild support from discord
+function eventOverwrite(orgEvent) {
+  const guildEventEdit = orgEvent;
+  guildEventEdit.scheduledStartTime = orgEvent.scheduledStartTimestamp;
+  guildEventEdit.scheduledEndTime = createdEvent.scheduledEndTimestamp
+    ? createdEvent.scheduledEndTimestamp
+    // plus 2 hours. discords default
+    : createdEvent.scheduledStartTimestamp + 7.2e+6;
+  guildEventEdit.description = `${orgEvent.description}\n${job.eventDescSuffix}\n\n${orgEvent.id}`;
+  let location;
+  switch (orgEvent.entityType) {
+    case GuildScheduledEventEntityType.StageInstance:
+      location = `Stage "${orgEvent.channel.name}" in ${orgEvent.guild.name}`;
+      return;
+    case GuildScheduledEventEntityType.Voice:
+      location = `VC "${orgEvent.channel.name}" in ${orgEvent.guild.name}`;
+      return;
+    default:
+      location = `"${orgEvent.entityMetadata.location}" in ${orgEvent.guild.name}`;
+  }
+  guildEventEdit.entityMetadata = { location };
+  guildEventEdit.entityType = 3;
+  return guildEventEdit;
+}
+
 client.on('ready', async () => {
   // confirm user logged in
   console.log(`[${config.package.name}] Logged in as "${client.user.tag}"!`);
@@ -84,29 +109,8 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
     // run create on all jobs
     .forEach((job) => {
       job.distribute.forEach(async (destriGuildID) => {
+        const guildEventEdit = eventOverwrite(updatedEvent);
         const guild = await client.guilds.cache.get(destriGuildID);
-        // create overwrites due to missing cross guild support from discord
-        const guildEventEdit = createdEvent;
-        guildEventEdit.scheduledStartTime = createdEvent.scheduledStartTimestamp;
-        guildEventEdit.scheduledEndTime = createdEvent.scheduledEndTimestamp
-          ? createdEvent.scheduledEndTimestamp
-          // plus 2 hours. discords default
-          : createdEvent.scheduledStartTimestamp + 7.2e+6;
-        guildEventEdit.description = `${createdEvent.description}\n${job.eventDescSuffix}\n\n${createdEvent.id}`;
-        let location;
-        switch (createdEvent.entityType) {
-          case GuildScheduledEventEntityType.StageInstance:
-            location = `Stage "${createdEvent.channel.name}" in ${createdEvent.guild.name}`;
-            break;
-          case GuildScheduledEventEntityType.Voice:
-            location = `VC "${createdEvent.channel.name}" in ${createdEvent.guild.name}`;
-            break;
-          default:
-            location = createdEvent.entityMetadata.location;
-            break;
-        }
-        guildEventEdit.entityMetadata = { location };
-        guildEventEdit.entityType = 3;
         guild.scheduledEvents.create(guildEventEdit);
       });
     });
