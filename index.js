@@ -58,6 +58,17 @@ function announcementHandler({
   });
 }
 
+function getJobEvents(job) {
+  const events = job.distribute.map((distributionGuildID) => {
+    const guild = client.guilds.cache.get(distributionGuildID);
+    const event = guild.scheduledEvents.cache
+      .find((remoteEvent) => remoteEvent.description.includes(deletedEvent.id));
+    if (!event) return console.warn(`Unable to find the event "${deletedEvent.name}" in the guild ${distributionGuildID}. The event was most likely edited or the bot was offline and didn't catch the update.`);
+    return event;
+  });
+  return events;
+}
+
 client.on('ready', async () => {
   // confirm user logged in
   console.log(`[${config.package.name}] Logged in as "${client.user.tag}"!`);
@@ -118,13 +129,8 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
 client.on('guildScheduledEventDelete', async (deletedEvent) => {
   const jobList = getJobList(deletedEvent);
   jobList.forEach((job) => {
-    job.distribute.forEach(async (distributionGuildID) => {
-      const guild = await client.guilds.cache.get(distributionGuildID);
-      const event = guild.scheduledEvents.cache
-        .find((remoteEvent) => remoteEvent.description.includes(deletedEvent.id));
-      if (!event) return console.warn(`Unable to find the event "${deletedEvent.name}" in the guild ${distributionGuildID}. The event was most likely edited or the bot was offline and didn't catch the update.`);
-      event.delete(event);
-    });
+    const events = getJobEvents(job);
+    events.forEach((event) => event.delete());
   });
 });
 
