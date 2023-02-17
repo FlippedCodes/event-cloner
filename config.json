@@ -5,25 +5,25 @@
         "jobs": [
           {
             "listen": ["451833819910373406"],
-            "distribute": ["300051375914483715"],
+            "distribute": ["356091547751677953"],
             "type": {
               "stageInstance": false,
               "voice": true,
               "external": true
             },
-            "eventDescSuffix": "Text after original desc"
+            "eventDescSuffix": "some desc"
           }
         ]
       },
       "eventAnnounce": {
         "jobs": [
           {
-            "channels": ["493510451234078730"],
+            "channels": ["493510451234078730", "397823906012069889"],
             "type": {
               "created": true,
               "started": true,
-              "textUpdated": false,
-              "timeUpdated": true,
+              "ended": true,
+              "generalUpdate": true,
               "deleted": true
             },
             "message": "Message before the link"

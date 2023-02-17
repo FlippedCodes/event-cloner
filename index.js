@@ -58,37 +58,39 @@ function announcementHandler({
   });
 }
 
-function getJobEvents(job) {
+function getJobEvents(job, orgEvent) {
   const events = job.distribute.map((distributionGuildID) => {
     const guild = client.guilds.cache.get(distributionGuildID);
     const event = guild.scheduledEvents.cache
-      .find((remoteEvent) => remoteEvent.description.includes(deletedEvent.id));
-    if (!event) return console.warn(`Unable to find the event "${deletedEvent.name}" in the guild ${distributionGuildID}. The event was most likely edited or the bot was offline and didn't catch the update.`);
+      .find((remoteEvent) => remoteEvent.description.includes(orgEvent.id));
+    if (!event) return console.warn(`Unable to find the event "${orgEvent.name}" in the guild ${distributionGuildID}.`);
     return event;
   });
   return events;
 }
 
 // create overwrites due to missing cross guild support from discord
-function eventOverwrite(orgEvent) {
+function eventOverwrite(suffixDesc, orgEvent) {
   const guildEventEdit = orgEvent;
   guildEventEdit.scheduledStartTime = orgEvent.scheduledStartTimestamp;
-  guildEventEdit.scheduledEndTime = createdEvent.scheduledEndTimestamp
-    ? createdEvent.scheduledEndTimestamp
+  guildEventEdit.scheduledEndTime = orgEvent.scheduledEndTimestamp
+    ? orgEvent.scheduledEndTimestamp
     // plus 2 hours. discords default
-    : createdEvent.scheduledStartTimestamp + 7.2e+6;
-  guildEventEdit.description = `${orgEvent.description}\n${job.eventDescSuffix}\n\n${orgEvent.id}`;
+    : orgEvent.scheduledStartTimestamp + 7.2e+6;
+  guildEventEdit.description = `${orgEvent.description}\n${suffixDesc}\n\n${orgEvent.id}`;
   let location;
   switch (orgEvent.entityType) {
     case GuildScheduledEventEntityType.StageInstance:
       location = `Stage "${orgEvent.channel.name}" in ${orgEvent.guild.name}`;
-      return;
+      break;
     case GuildScheduledEventEntityType.Voice:
       location = `VC "${orgEvent.channel.name}" in ${orgEvent.guild.name}`;
-      return;
+      break;
     default:
       location = `"${orgEvent.entityMetadata.location}" in ${orgEvent.guild.name}`;
+      break;
   }
+  guildEventEdit.channelId = null;
   guildEventEdit.entityMetadata = { location };
   guildEventEdit.entityType = 3;
   return guildEventEdit;
@@ -109,7 +111,7 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
     // run create on all jobs
     .forEach((job) => {
       job.distribute.forEach(async (destriGuildID) => {
-        const guildEventEdit = eventOverwrite(updatedEvent);
+        const guildEventEdit = eventOverwrite(job.eventDescSuffix, createdEvent);
         const guild = await client.guilds.cache.get(destriGuildID);
         guild.scheduledEvents.create(guildEventEdit);
       });
@@ -119,23 +121,28 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
 // TODO: needs testing
 client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
   const jobList = getJobList(updatedEvent);
-  const eventList = jobList.map((job) => getJobEvents(job));
-  // event starts
-  if (updatedEvent.isActive()) eventList.forEach((event) => event.setStatus(GuildScheduledEventStatus.Active));
-  // ended successfully
-  else if (updatedEvent.isCompleted()) eventList.forEach((event) => event.setStatus(GuildScheduledEventStatus.Completed));
-  // general update
-  else if (updatedEvent.isScheduled()) {
-    const guildEventEdit = eventOverwrite(updatedEvent);
-    eventList.forEach((event) => event.edit(guildEventEdit));
-  } else console.warn(`Unknown update on the event ${updatedEvent.id} - ${updatedEvent.name}`);
+  const eventList = jobList.map((job) => [getJobEvents(job, updatedEvent), job.eventDescSuffix]);
+  eventList.forEach(([events, eventDesc]) => {
+    // event starts
+    if (updatedEvent.isActive()) events.forEach((event) => (event ? event.setStatus(GuildScheduledEventStatus.Active) : null));
+    // ended successfully
+    else if (updatedEvent.isCompleted()) events.forEach((event) => (event ? event.setStatus(GuildScheduledEventStatus.Completed) : null));
+    // general update
+    else if (updatedEvent.isScheduled()) {
+      events.forEach((event) => {
+        if (!event) return;
+        const guildEventEdit = eventOverwrite(eventDesc, updatedEvent);
+        event.edit(guildEventEdit);
+      });
+    } else console.warn(`Unknown update on the event ${updatedEvent.id} - ${updatedEvent.name}`);
+  });
 });
 
 client.on('guildScheduledEventDelete', async (deletedEvent) => {
   const jobList = getJobList(deletedEvent);
   jobList.forEach((job) => {
-    const events = getJobEvents(job);
-    events.forEach((event) => event.delete());
+    const events = getJobEvents(job, deletedEvent);
+    events.forEach((event) => (event ? event.delete() : null));
   });
 });
 
@@ -153,6 +160,41 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
       text: `${job.message}\n${createdEvent}`,
     });
   });
+});
+
+// TODO: needs testing
+client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
+  // event starts
+  if (updatedEvent.isActive()) {
+    config.functions.eventAnnounce.jobs.filter((job) => job.type.started).forEach((job) => {
+      announcementHandler({
+        event: updatedEvent,
+        job,
+        update: `Event **${updatedEvent.name}** has has started!`,
+        color: 'Blurple',
+      });
+    });
+  // ended successfully
+  } else if (updatedEvent.isCompleted()) {
+    config.functions.eventAnnounce.jobs.filter((job) => job.type.ended).forEach((job) => {
+      announcementHandler({
+        event: updatedEvent,
+        job,
+        update: `Event **${updatedEvent.name}** is now over.\nThanks for joining`,
+        color: 'DarkBlue',
+      });
+    });
+  // general update
+  } else if (updatedEvent.isScheduled()) {
+    config.functions.eventAnnounce.jobs.filter((job) => job.type.generalUpdate).forEach((job) => {
+      announcementHandler({
+        event: updatedEvent,
+        job,
+        update: `Event **${updatedEvent.name}** has been updated.`,
+        color: 'DarkGreen',
+      });
+    });
+  } else console.warn(`Unknown update on the event ${updatedEvent.id} - ${updatedEvent.name}`);
 });
 
 client.on('guildScheduledEventDelete', async (deletedEvent) => {
