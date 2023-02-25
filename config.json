@@ -4,29 +4,29 @@
       "eventCloner": {
         "jobs": [
           {
-            "listen": ["451833819910373406"],
-            "distribute": ["356091547751677953"],
+            "listen": ["850214407400456194"],
+            "distribute": ["300051375914483715"],
             "type": {
               "stageInstance": false,
               "voice": true,
               "external": true
             },
-            "eventDescSuffix": "some desc"
+            "eventDescSuffix": "Make sure you read <#1041575569038512209> and join Vore'vali beforehand!"
           }
         ]
       },
       "eventAnnounce": {
         "jobs": [
           {
-            "channels": ["493510451234078730", "397823906012069889"],
+            "channels": [],
             "type": {
-              "created": true,
-              "started": true,
-              "ended": true,
-              "generalUpdate": true,
-              "deleted": true
+              "created": false,
+              "started": false,
+              "ended": false,
+              "generalUpdate": false,
+              "deleted": false
             },
-            "message": "Message before the link"
+            "message": ""
           }
         ]
       }
