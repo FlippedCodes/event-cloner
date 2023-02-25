@@ -190,8 +190,9 @@ client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
       announcementHandler({
         event: updatedEvent,
         job,
-        update: `Event **${updatedEvent.name}** has been updated.`,
+        update: `Event **${updatedEvent.name}** has been updated.\nCheck the event to see the updates.`,
         color: 'DarkGreen',
+        text: `${job.message}\n${updatedEvent}`,
       });
     });
   } else console.warn(`Unknown update on the event ${updatedEvent.id} - ${updatedEvent.name}`);
