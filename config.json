@@ -18,13 +18,13 @@
       "eventAnnounce": {
         "jobs": [
           {
-            "channels": [],
+            "channels": ["496990745488654342"],
             "type": {
-              "created": false,
+              "created": true,
               "started": false,
               "ended": false,
               "generalUpdate": false,
-              "deleted": false
+              "deleted": true
             },
             "message": ""
           }
