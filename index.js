@@ -71,7 +71,8 @@ function getJobEvents(job, orgEvent) {
 
 // create overwrites due to missing cross guild support from discord
 function eventOverwrite(suffixDesc, orgEvent) {
-  const guildEventEdit = orgEvent;
+  // needs to be a copy or the event desc. gets copied to another job
+  const guildEventEdit = JSON.parse(JSON.stringify(orgEvent));
   guildEventEdit.scheduledStartTime = orgEvent.scheduledStartTimestamp;
   guildEventEdit.scheduledEndTime = orgEvent.scheduledEndTimestamp
     ? orgEvent.scheduledEndTimestamp
