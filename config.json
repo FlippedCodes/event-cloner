@@ -11,17 +11,7 @@
               "voice": true,
               "external": true
             },
-            "eventDescSuffix": "=====================\nMake sure you read <#1041575569038512209> and join Vore'vali beforehand."
-          },
-          {
-            "listen": ["850214407400456194"],
-            "distribute": ["730609289110224947"],
-            "type": {
-              "stageInstance": false,
-              "voice": true,
-              "external": true
-            },
-            "eventDescSuffix": "=====================\nTo join the NeosVR meet, you will have to join <#1040408096134144091>, verify your age and read the rules in their server."
+            "eventDescSuffix": "=====================\nMake sure to join and verify in the Vore'vali server beforehand."
           }
         ]
       },
