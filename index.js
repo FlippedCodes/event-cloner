@@ -156,7 +156,7 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
     announcementHandler({
       event: createdEvent,
       job,
-      update: 'New Event!',
+      update: `New Event **${createdEvent.name}** got announced!`,
       color: 'Green',
       text: `${job.message}\n${createdEvent}`,
     });
