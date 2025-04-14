@@ -119,10 +119,10 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
     });
 });
 
-// TODO: needs testing
 client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
   const jobList = getJobList(updatedEvent);
   const eventList = jobList.map((job) => [getJobEvents(job, updatedEvent), job.eventDescSuffix]);
+  // FIXME: event doesn't listen on reoccurring cancellations.
   eventList.forEach(([events, eventDesc]) => {
     // event starts
     if (updatedEvent.isActive()) events.forEach((event) => (event ? event.setStatus(GuildScheduledEventStatus.Active) : null));
