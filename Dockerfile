@@ -1,5 +1,5 @@
 # get node
-FROM node:18.5.0-buster-slim
+FROM node:22.11.0-buster-slim
 
 # Create app directory
 WORKDIR /usr/src/app
