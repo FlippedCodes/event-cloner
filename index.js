@@ -163,7 +163,6 @@ client.on('guildScheduledEventCreate', async (createdEvent) => {
   });
 });
 
-// TODO: needs testing
 client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
   // event starts
   if (updatedEvent.isActive()) {
