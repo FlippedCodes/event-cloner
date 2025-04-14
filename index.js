@@ -132,6 +132,8 @@ client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
     else if (updatedEvent.isScheduled()) {
       events.forEach((event) => {
         if (!event) return;
+        // fallback needed for re-occurring events. Can't update the event, if it is active.
+        if (oldEvent.isActive()) event.setStatus(GuildScheduledEventStatus.Completed);
         const guildEventEdit = eventOverwrite(eventDesc, updatedEvent);
         event.edit(guildEventEdit);
       });
@@ -174,8 +176,8 @@ client.on('guildScheduledEventUpdate', async (oldEvent, updatedEvent) => {
         color: 'Blurple',
       });
     });
-  // ended successfully
-  } else if (updatedEvent.isCompleted()) {
+  // ended successfully or re-occurring event ended
+  } else if (updatedEvent.isCompleted() || (updatedEvent.isScheduled() && oldEvent.isActive())) {
     config.functions.eventAnnounce.jobs.filter((job) => job.type.ended).forEach((job) => {
       announcementHandler({
         event: updatedEvent,
