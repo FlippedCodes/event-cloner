@@ -1,5 +1,5 @@
 # get node
-FROM node:23.11-bullseye-slim
+FROM node:23.11
 
 # Create app directory
 WORKDIR /usr/src/app
