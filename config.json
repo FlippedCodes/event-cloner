@@ -12,6 +12,16 @@
               "external": true
             },
             "eventDescSuffix": "=====================\nMake sure to join and verify in the Vore'vali server beforehand."
+          },
+          {
+            "listen": ["212684714203414528"],
+            "distribute": ["300051375914483715"],
+            "type": {
+              "stageInstance": false,
+              "voice": false,
+              "external": true
+            },
+            "eventDescSuffix": "=====================\nMake sure to join the Vore Nation Discord server and get vetted by someone in it or by Phil."
           }
         ]
       },
